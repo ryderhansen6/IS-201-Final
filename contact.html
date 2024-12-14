@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
+        #gameCanvas {
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+        <div class="container px-5">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="resume.html">Resume</a></li>
+                    <li class="nav-item"><a class="nav-link" href="projects.html">Scratch Page</a></li>
+                    <li class="nav-item"><a class="nav-link" href="game.html">Game</a></li> <!-- Link to Pac-Man game -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Canvas for the Pac-Man game -->
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        // Game logic goes here
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const pacSize = 20;
+        let pacX = 200, pacY = 200;
+        let pacDX = 0, pacDY = 0;
+        let dots = [];
+        let score = 0;
+
+        // Function to generate random dots
+        function generateDots() {
+            for (let i = 0; i < 10; i++) {
+                const dotX = Math.floor(Math.random() * (canvas.width / pacSize)) * pacSize;
+                const dotY = Math.floor(Math.random() * (canvas.height / pacSize)) * pacSize;
+                dots.push({ x: dotX, y: dotY });
+            }
+        }
+
+        // Draw the game elements
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'yellow';
+            ctx.beginPath();
+            ctx.arc(pacX, pacY, pacSize, 0.2 * Math.PI, 1.8 * Math.PI);
+            ctx.lineTo(pacX, pacY);
+            ctx.fill();
+            
+            // Draw the dots
+            ctx.fillStyle = 'white';
+            dots.forEach(dot => {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // Display the score
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 30);
+        }
+
+        // Update Pac-Man position based on movement
+        function updatePacMan() {
+            pacX += pacDX;
+            pacY += pacDY;
+
+            if (pacX < 0) pacX = canvas.width - pacSize;
+            if (pacY < 0) pacY = canvas.height - pacSize;
+            if (pacX >= canvas.width) pacX = 0;
+            if (pacY >= canvas.height) pacY = 0;
+        }
+
+        // Detect collision with dots
+        function detectCollision() {
+            for (let i = 0; i < dots.length; i++) {
+                const dot = dots[i];
+                const dist = Math.hypot(pacX - dot.x, pacY - dot.y);
+                if (dist < pacSize) {
+                    dots.splice(i, 1);
+                    score++;
+                    break;
+                }
+            }
+        }
+
+        // Listen for keyboard input
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') { pacDX = 0; pacDY = -pacSize; }
+            if (e.key === 'ArrowDown') { pacDX = 0; pacDY = pacSize; }
+            if (e.key === 'ArrowLeft') { pacDX = -pacSize; pacDY = 0; }
+            if (e.key === 'ArrowRight') { pacDX = pacSize; pacDY = 0; }
+        });
+
+        // Game loop with slower speed using setInterval
+        function gameLoop() {
+            updatePacMan();
+            detectCollision();
+            drawGame();
+        }
+
+        // Set game loop interval to 100 milliseconds (slows down the game)
+        setInterval(gameLoop, 100); // Change the 100ms to a higher value for slower speed
+
+        generateDots();
+    </script>
+
+    <!-- Bootstrap JS for navbar functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
